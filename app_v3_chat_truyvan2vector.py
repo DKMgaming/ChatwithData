@@ -49,7 +49,7 @@ def authenticate_google_drive():
 drive = authenticate_google_drive()
 
 # Hàm lưu log vào Google Drive
-def save_user_questions_log_to_drive(drive, file_content, file_name, folder_id=None):
+def save_log_to_google_drive(drive, file_content, file_name, folder_id=None):
     file_metadata = {'title': file_name}
     if folder_id:
         file_metadata['parents'] = [{'id': folder_id}]  # Gán file vào thư mục cụ thể
