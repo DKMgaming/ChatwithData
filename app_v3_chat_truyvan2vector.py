@@ -3,13 +3,57 @@ import google.generativeai as genai
 from pinecone import Pinecone
 import json
 import os
+from pydrive2.auth import GoogleAuth
+from pydrive2.drive import GoogleDrive
+from oauth2client.service_account import ServiceAccountCredentials
 
-# Thiết lập Gemini API key
-genai_api_key = "AIzaSyAfQfOJgGCRxJyDMjr9Kv5XpBGTZX_pASQ"  # Thay thế bằng API key của bạn
+# Đọc credentials từ biến môi trường
+import os
+import json
+
+def authenticate_google_drive():
+    # Lấy credentials từ biến môi trường
+    credentials_dict = json.loads(st.secrets["gdrive_credentials"])
+    
+    # Tạo file tạm cho credentials
+    with open("temp_credentials.json", "w") as f:
+        json.dump(credentials_dict, f)
+
+    # Thiết lập xác thực Service Account
+    gauth = GoogleAuth()
+    gauth.credentials = ServiceAccountCredentials.from_json_keyfile_name(
+        "temp_credentials.json",
+        scopes=["https://www.googleapis.com/auth/drive"]
+    )
+    drive = GoogleDrive(gauth)
+    
+    # Xóa file tạm
+    os.remove("temp_credentials.json")
+    
+    return drive
+
+# Thiết lập Google Drive
+drive = authenticate_google_drive()
+
+# Hàm lưu log vào Google Drive
+def save_log_to_google_drive(history, log_filename="user_questions_log.json"):
+    log_file_path = log_filename
+
+    # Lưu log vào file tạm thời
+    with open(log_file_path, "w", encoding='utf-8') as log_file:
+        json.dump(history, log_file, ensure_ascii=False, indent=4)
+
+    # Upload file log lên Google Drive
+    log_file_drive = drive.CreateFile({'title': log_filename})
+    log_file_drive.SetContentFile(log_file_path)
+    log_file_drive.Upload()
+    st.success("Log đã được lưu vào Google Drive")
+
+# Cấu hình Gemini API và Pinecone
+genai_api_key = st.secrets["genai_api_key"]
 genai.configure(api_key=genai_api_key)
 
-# Thiết lập Pinecone
-pc = Pinecone(api_key="665d65c5-fb1f-45f9-8bf0-e3ad3d5a93bd")
+pc = Pinecone(api_key=st.secrets["pinecone_api_key"])
 index = pc.Index("data-index")
 index_1 = pc.Index("kethop-index")
 
@@ -51,18 +95,6 @@ def find_best_answer(user_question):
     rewritten_answers = rewrite_answer_with_gemini(content_to_rewrite)
     return rewritten_answers
 
-# Hàm lưu log vào file trên server
-def save_log_to_server(history, log_filename="user_questions_log.json"):
-    # Ghi file vào thư mục logs (hoặc thư mục tùy chọn trên server)
-    logs_dir = "logs"
-    if not os.path.exists(logs_dir):
-        os.makedirs(logs_dir)  # Tạo thư mục nếu chưa có
-    log_file_path = os.path.join(logs_dir, log_filename)
-
-    # Ghi hoặc cập nhật log file
-    with open(log_file_path, "w", encoding='utf-8') as log_file:
-        json.dump(history, log_file, ensure_ascii=False, indent=4)
-
 # Giao diện Streamlit
 st.title("Hỏi đáp thông tin tần số vô tuyến điện")
 
@@ -87,8 +119,8 @@ if submit_button and user_question:
         # Lưu câu hỏi và câu trả lời vào session state
         st.session_state.history.append({"question": user_question, "answer": best_answer})
         
-        # Ghi log vào file trên server
-        save_log_to_server(st.session_state.history)
+        # Ghi log vào Google Drive
+        save_log_to_google_drive(st.session_state.history)
 
         # Xóa nội dung câu hỏi sau khi xử lý xong
         st.session_state.user_question = ""
