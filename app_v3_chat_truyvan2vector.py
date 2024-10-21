@@ -1,6 +1,4 @@
 import streamlit as st
-from googleapiclient.discovery import build
-from google.oauth2 import service_account
 import google.generativeai as genai
 from pinecone import Pinecone
 
