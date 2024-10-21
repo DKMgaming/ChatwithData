@@ -40,20 +40,33 @@ drive = authenticate_google_drive()
 
 # Hàm lưu log vào Google Drive
 def save_user_questions_log_to_drive(drive, log_data, file_name, folder_id=None):
-    # Chuyển đổi thành định dạng JSON với UTF-8 encoding và ensure_ascii=False để giữ nguyên ký tự Unicode
-    file_content = json.dumps(log_data, ensure_ascii=False, indent=4)  # Điều chỉnh để lưu UTF-8
+    # Chuyển đổi log_data thành dạng văn bản
+    # Nếu log_data là danh sách hoặc từ điển, bạn cần chuyển đổi nó thành chuỗi văn bản
+    file_content = ""
     
-    file_metadata = {'title': file_name}
+    if isinstance(log_data, dict):
+        # Nếu log_data là từ điển, chuyển đổi thành chuỗi văn bản
+        for key, value in log_data.items():
+            file_content += f"{key}: {value}\n"
+    elif isinstance(log_data, list):
+        # Nếu log_data là danh sách, chuyển đổi từng mục thành chuỗi văn bản
+        file_content = "\n".join([str(item) for item in log_data])
+    else:
+        # Nếu log_data không phải là từ điển hay danh sách, giữ nguyên nội dung chuỗi
+        file_content = str(log_data)
+
+    file_metadata = {'title': file_name + ".txt"}  # Đặt phần mở rộng là .txt
     if folder_id:
         file_metadata['parents'] = [{'id': folder_id}]  # Gán file vào thư mục cụ thể
     
     file_drive = drive.CreateFile(file_metadata)
     
-    # Đảm bảo lưu dữ liệu với UTF-8 encoding khi sử dụng SetContentString
-    file_drive.SetContentString(file_content)  # UTF-8 được xử lý bởi json.dumps khi ensure_ascii=False
+    # Lưu file dưới dạng văn bản
+    file_drive.SetContentString(file_content)  # Lưu nội dung văn bản
     
     file_drive.Upload()
-    print(f"File '{file_name}' has been uploaded to Google Drive.")
+    print(f"File '{file_name}.txt' has been uploaded to Google Drive.")
+
 
 
 
