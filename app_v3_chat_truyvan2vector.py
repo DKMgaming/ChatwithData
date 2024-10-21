@@ -1,6 +1,7 @@
 import streamlit as st
 import google.generativeai as genai
-from pinecone import Pinecone
+from pinecone import Pinecone, ServerlessSpec
+import pinecone
 #import streamlit as st
 from pydrive2.auth import GoogleAuth
 from pydrive2.drive import GoogleDrive
