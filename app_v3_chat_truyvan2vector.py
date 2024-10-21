@@ -48,24 +48,35 @@ def save_user_questions_log_to_drive(drive, file_content, file_name, folder_id=N
     file_drive.Upload()
     print(f"File '{file_name}' has been uploaded to Google Drive.")
 
-# Thiết lập Pinecone và Gemini API
-genai_api_key = st.secrets["genai_api_key"]
+# Thiết lập Gemini API
+genai_api_key = "AIzaSyAfQfOJgGCRxJyDMjr9Kv5XpBGTZX_pASQ"
 genai.configure(api_key=genai_api_key)
 
-pinecone_api_key = st.secrets["pinecone_api_key"]
-pinecone.init(api_key=pinecone_api_key)
+pc = pinecone.Pinecone(api_key="665d65c5-fb1f-45f9-8bf0-e3ad3d5a93bd")
 
-index = pinecone.Index("data-index")
-index_1 = pinecone.Index("kethop-index")
+index = pc.Index("data-index")
+index_1 = pc.Index("kethop-index")
 
+def get_embeddings(text):
+    embedding = pc.inference.embed(
+    model="multilingual-e5-large",
+    inputs=[text],
+    parameters={
+        "input_type": "query"
+    }
+)
+    return embedding.data[0]['values']
+
+# Hàm lấy embedding từ Gemini API
 def get_gemini_embedding(text):
-    response = pinecone.Index("data-index").query(
-        namespace="ns1",
-        top_k=10,
-        vector=[text],
-        include_metadata=True
-    )
-    return response['matches'][0]['values']
+    response = pc.inference.embed(
+    model="multilingual-e5-large",
+    inputs=[text],
+    parameters={
+        "input_type": "query"
+    }
+)
+    return response.data[0]['values']
 
 def rewrite_answer_with_gemini(content):
     model = genai.GenerativeModel('gemini-1.5-flash')
