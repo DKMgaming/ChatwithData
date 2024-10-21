@@ -121,9 +121,9 @@ if submit_button and user_question:
         
         st.session_state.history.append({"question": user_question, "answer": best_answer})
 
-        log_data_json = json.dumps(st.session_state.history, indent=4)
+        #log_data_json = json.dumps(st.session_state.history, indent=4)
         folder_id = '1pLA6AH8gC2Ujg_2CXYaCplM-Xa1ALsRR'
-        save_user_questions_log_to_drive(drive, log_data_json, "user_questions_log.json", folder_id)
+        save_user_questions_log_to_drive(drive, st.session_state.history, "user_questions_log.txt", folder_id)
 
         st.session_state.user_question = ""
     except ValueError as e:
