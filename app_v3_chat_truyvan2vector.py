@@ -59,7 +59,7 @@ def save_user_questions_log_to_drive(drive, file_content, file_name, folder_id=N
     print(f"File '{file_name}' has been uploaded to Google Drive.")
 
 # Nội dung của file JSON cần lưu
-log_data = {"question": user_question, "answer": best_answer}
+log_data = {"question": [{user_question}, {best_answer}]}
 
 # Chuyển đổi thành định dạng JSON
 log_data_json = json.dumps(log_data, indent=4)
