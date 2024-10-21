@@ -66,11 +66,7 @@ if not genai_api_key:
     st.error("API key cho Gemini không tồn tại.")
 
 
-pinecone_api_key = st.secrets.get("pinecone_api_key", None)
-if not pinecone_api_key:
-    st.error("Pinecone API key không tồn tại trong secrets.")
-else:
-    pc = Pinecone(api_key=pinecone_api_key)
+pc = pinecone.Pinecone(api_key="665d65c5-fb1f-45f9-8bf0-e3ad3d5a93bd")
 
 index = pc.Index("data-index")
 index_1 = pc.Index("kethop-index")
