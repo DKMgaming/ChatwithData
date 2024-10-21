@@ -66,7 +66,6 @@ def save_log_to_google_drive(history, log_filename="user_questions_log.json"):
 genai_api_key = "AIzaSyAfQfOJgGCRxJyDMjr9Kv5XpBGTZX_pASQ"
 genai.configure(api_key=genai_api_key)
 
-
 pc = pinecone.Pinecone(api_key="665d65c5-fb1f-45f9-8bf0-e3ad3d5a93bd")
 
 index = pc.Index("data-index")
