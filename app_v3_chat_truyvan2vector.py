@@ -39,14 +39,19 @@ def authenticate_google_drive():
 drive = authenticate_google_drive()
 
 # Hàm lưu log vào Google Drive
-def save_user_questions_log_to_drive(drive, file_content, file_name, folder_id=None):
+# Hàm lưu log vào Google Drive
+def save_user_questions_log_to_drive(drive, log_data, file_name, folder_id=None):
+    # Chuyển đổi thành định dạng JSON với UTF-8 encoding và ensure_ascii=False để giữ nguyên ký tự Unicode
+    file_content = json.dumps(log_data, ensure_ascii=False, indent=4)  # Điều chỉnh để lưu UTF-8
+    
     file_metadata = {'title': file_name}
     if folder_id:
-        file_metadata['parents'] = [{'id': folder_id}]
+        file_metadata['parents'] = [{'id': folder_id}]  # Gán file vào thư mục cụ thể
     file_drive = drive.CreateFile(file_metadata)
     file_drive.SetContentString(file_content)
     file_drive.Upload()
     print(f"File '{file_name}' has been uploaded to Google Drive.")
+
 
 # Thiết lập Gemini API
 genai_api_key = "AIzaSyAfQfOJgGCRxJyDMjr9Kv5XpBGTZX_pASQ"
