@@ -9,30 +9,29 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 # Đọc credentials từ biến môi trường
 import os
-import json
 
+# Hàm để xác thực Google Drive
 def authenticate_google_drive():
-    # Lấy credentials từ biến môi trường
-    credentials_dict = json.loads(st.secrets["gdrive_credentials"])
-    
-    # Tạo file tạm cho credentials
+    # Lấy thông tin credentials trực tiếp từ st.secrets mà không cần json.loads()
+    credentials_dict = st.secrets["gdrive_credentials"]
+
+    # Tạo file credentials tạm thời từ credentials_dict
     with open("temp_credentials.json", "w") as f:
         json.dump(credentials_dict, f)
 
-    # Thiết lập xác thực Service Account
     gauth = GoogleAuth()
     gauth.credentials = ServiceAccountCredentials.from_json_keyfile_name(
         "temp_credentials.json",
         scopes=["https://www.googleapis.com/auth/drive"]
     )
     drive = GoogleDrive(gauth)
-    
-    # Xóa file tạm
+
+    # Xóa file credentials tạm thời sau khi sử dụng
     os.remove("temp_credentials.json")
-    
+
     return drive
 
-# Thiết lập Google Drive
+# Sử dụng Google Drive
 drive = authenticate_google_drive()
 
 # Hàm lưu log vào Google Drive
