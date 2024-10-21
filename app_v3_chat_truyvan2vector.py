@@ -94,7 +94,7 @@ def get_gemini_embedding(text):
 
 # Hàm để viết lại câu trả lời bằng Gemini AI
 def rewrite_answer_with_gemini(content):
-    model = genai.GenerativeModel('gemini-1.5-pro')
+    model = genai.GenerativeModel('gemini-1.5-flash')
     response = model.generate_content("tổng hợp lại nội dung: " + content)
     return response.text
 
