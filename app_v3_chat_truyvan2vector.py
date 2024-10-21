@@ -41,7 +41,7 @@ drive = authenticate_google_drive()
 def save_user_questions_log_to_drive(drive, log_data, file_name, folder_id=None):
     # Chuyển đổi log_data thành dạng văn bản với UTF-8
     file_content = ""
-    
+
     # Nếu log_data là danh sách, duyệt qua từng mục (câu hỏi và câu trả lời)
     if isinstance(log_data, list):
         for item in log_data:
@@ -52,18 +52,19 @@ def save_user_questions_log_to_drive(drive, log_data, file_name, folder_id=None)
     else:
         file_content = str(log_data)
 
-    # Tạo metadata và lưu file dưới dạng .txt
-    file_metadata = {'title': file_name + ".txt"}  # Đặt phần mở rộng là .txt
+    # Tạo metadata cho file
+    file_metadata = {'title': file_name + ".txt"}
     if folder_id:
         file_metadata['parents'] = [{'id': folder_id}]  # Gán file vào thư mục cụ thể
 
     file_drive = drive.CreateFile(file_metadata)
-    
-    # Lưu nội dung văn bản tiếng Việt (đã xử lý UTF-8)
-    file_drive.SetContentString(file_content)
+
+    # Lưu nội dung văn bản tiếng Việt
+    file_drive.SetContentString(file_content.encode('utf-8').decode('utf-8'))  # Đảm bảo nội dung là UTF-8
     file_drive.Upload()
     
     print(f"File '{file_name}.txt' đã được tải lên Google Drive.")
+
 
 # Thiết lập Gemini API
 genai_api_key = "AIzaSyAfQfOJgGCRxJyDMjr9Kv5XpBGTZX_pASQ"
