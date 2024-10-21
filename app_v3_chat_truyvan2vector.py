@@ -38,38 +38,32 @@ def authenticate_google_drive():
 # Sử dụng Google Drive
 drive = authenticate_google_drive()
 
-# Hàm lưu log vào Google Drive
 def save_user_questions_log_to_drive(drive, log_data, file_name, folder_id=None):
-    # Chuyển đổi log_data thành dạng văn bản
-    # Nếu log_data là danh sách hoặc từ điển, bạn cần chuyển đổi nó thành chuỗi văn bản
+    # Chuyển đổi log_data thành dạng văn bản với UTF-8
     file_content = ""
     
-    if isinstance(log_data, dict):
-        # Nếu log_data là từ điển, chuyển đổi thành chuỗi văn bản
-        for key, value in log_data.items():
-            file_content += f"{key}: {value}\n"
-    elif isinstance(log_data, list):
-        # Nếu log_data là danh sách, chuyển đổi từng mục thành chuỗi văn bản
-        file_content = "\n".join([str(item) for item in log_data])
+    # Nếu log_data là danh sách, duyệt qua từng mục (câu hỏi và câu trả lời)
+    if isinstance(log_data, list):
+        for item in log_data:
+            question = item.get("question", "")
+            answer = item.get("answer", "")
+            file_content += f"Câu hỏi: {question}\n"
+            file_content += f"Trả lời: {answer}\n\n"
     else:
-        # Nếu log_data không phải là từ điển hay danh sách, giữ nguyên nội dung chuỗi
         file_content = str(log_data)
 
+    # Tạo metadata và lưu file dưới dạng .txt
     file_metadata = {'title': file_name + ".txt"}  # Đặt phần mở rộng là .txt
     if folder_id:
         file_metadata['parents'] = [{'id': folder_id}]  # Gán file vào thư mục cụ thể
-    
+
     file_drive = drive.CreateFile(file_metadata)
     
-    # Lưu file dưới dạng văn bản
-    file_drive.SetContentString(file_content)  # Lưu nội dung văn bản
-    
+    # Lưu nội dung văn bản tiếng Việt (đã xử lý UTF-8)
+    file_drive.SetContentString(file_content)
     file_drive.Upload()
-    print(f"File '{file_name}.txt' has been uploaded to Google Drive.")
-
-
-
-
+    
+    print(f"File '{file_name}.txt' đã được tải lên Google Drive.")
 # Thiết lập Gemini API
 genai_api_key = "AIzaSyAfQfOJgGCRxJyDMjr9Kv5XpBGTZX_pASQ"
 genai.configure(api_key=genai_api_key)
