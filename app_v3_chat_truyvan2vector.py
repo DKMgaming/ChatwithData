@@ -57,16 +57,6 @@ pc = pinecone.Pinecone(api_key="665d65c5-fb1f-45f9-8bf0-e3ad3d5a93bd")
 index = pc.Index("data-index")
 index_1 = pc.Index("kethop-index")
 
-def get_embeddings(text):
-    embedding = pc.inference.embed(
-    model="multilingual-e5-large",
-    inputs=[text],
-    parameters={
-        "input_type": "query"
-    }
-)
-    return embedding.data[0]['values']
-
 # Hàm lấy embedding từ Gemini API
 def get_gemini_embedding(text):
     response = pc.inference.embed(
