@@ -61,9 +61,10 @@ def save_log_to_google_drive(history, log_filename="user_questions_log.json"):
     log_file_drive.Upload()
     st.success("Log đã được lưu vào Google Drive")
 
-# Cấu hình Gemini API và Pinecone
-genai_api_key = st.secrets["genai_api_key"]
-genai.configure(api_key=genai_api_key)
+genai_api_key = st.secrets.get("genai_api_key", None)
+if not genai_api_key:
+    st.error("API key cho Gemini không tồn tại.")
+
 
 pc = Pinecone(api_key=st.secrets["pinecone_api_key"])
 index = pc.Index("data-index")
