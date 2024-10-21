@@ -1,19 +1,22 @@
 import streamlit as st
 import google.generativeai as genai
 from pinecone import Pinecone
-import json
-import os
+#import streamlit as st
 from pydrive2.auth import GoogleAuth
 from pydrive2.drive import GoogleDrive
 from oauth2client.service_account import ServiceAccountCredentials
-
-# Đọc credentials từ biến môi trường
 import os
+import json
 
 # Hàm để xác thực Google Drive
 def authenticate_google_drive():
-    # Lấy thông tin credentials trực tiếp từ st.secrets mà không cần json.loads()
+    # Lấy thông tin credentials trực tiếp từ st.secrets
     credentials_dict = st.secrets["gdrive_credentials"]
+
+    # Kiểm tra từng giá trị trong credentials_dict và chuyển đổi nếu cần
+    for key, value in credentials_dict.items():
+        if isinstance(value, bytes):  # Nếu là kiểu dữ liệu bytes, chuyển thành string
+            credentials_dict[key] = value.decode("utf-8")
 
     # Tạo file credentials tạm thời từ credentials_dict
     with open("temp_credentials.json", "w") as f:
