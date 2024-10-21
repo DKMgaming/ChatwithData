@@ -4,10 +4,6 @@ from google.oauth2 import service_account
 import google.generativeai as genai
 from pinecone import Pinecone
 
-# Thiết lập xác thực Google API
-SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly', 'https://www.googleapis.com/auth/documents.readonly']
-SERVICE_ACCOUNT_FILE = 'duancuatoi-424101-913a0af4a05b.json'
-creds = service_account.Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
 
 # Thiết lập Gemini API key
 genai_api_key = "AIzaSyAfQfOJgGCRxJyDMjr9Kv5XpBGTZX_pASQ"  # Thay thế bằng API key của bạn
