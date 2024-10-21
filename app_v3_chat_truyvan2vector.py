@@ -8,19 +8,29 @@ from oauth2client.service_account import ServiceAccountCredentials
 import os
 import json
 
+# Hàm để kiểm tra và xử lý các kiểu dữ liệu không hợp lệ
+def make_json_serializable(credentials_dict):
+    serializable_dict = {}
+    for key, value in credentials_dict.items():
+        # Nếu giá trị là bytes, chuyển thành string
+        if isinstance(value, bytes):
+            serializable_dict[key] = value.decode("utf-8")
+        # Nếu giá trị là kiểu dữ liệu khác không hỗ trợ, chuyển thành string
+        else:
+            serializable_dict[key] = str(value)
+    return serializable_dict
+
 # Hàm để xác thực Google Drive
 def authenticate_google_drive():
     # Lấy thông tin credentials trực tiếp từ st.secrets
     credentials_dict = st.secrets["gdrive_credentials"]
 
-    # Kiểm tra từng giá trị trong credentials_dict và chuyển đổi nếu cần
-    for key, value in credentials_dict.items():
-        if isinstance(value, bytes):  # Nếu là kiểu dữ liệu bytes, chuyển thành string
-            credentials_dict[key] = value.decode("utf-8")
+    # Chuyển đổi các kiểu dữ liệu không hợp lệ thành chuỗi
+    credentials_dict_serializable = make_json_serializable(credentials_dict)
 
-    # Tạo file credentials tạm thời từ credentials_dict
+    # Tạo file credentials tạm thời từ credentials_dict_serializable
     with open("temp_credentials.json", "w") as f:
-        json.dump(credentials_dict, f)
+        json.dump(credentials_dict_serializable, f)
 
     gauth = GoogleAuth()
     gauth.credentials = ServiceAccountCredentials.from_json_keyfile_name(
