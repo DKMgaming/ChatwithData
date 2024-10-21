@@ -64,6 +64,7 @@ def save_user_questions_log_to_drive(drive, log_data, file_name, folder_id=None)
     file_drive.Upload()
     
     print(f"File '{file_name}.txt' đã được tải lên Google Drive.")
+
 # Thiết lập Gemini API
 genai_api_key = "AIzaSyAfQfOJgGCRxJyDMjr9Kv5XpBGTZX_pASQ"
 genai.configure(api_key=genai_api_key)
