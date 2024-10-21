@@ -1,7 +1,8 @@
 import streamlit as st
 import google.generativeai as genai
 from pinecone import Pinecone
-
+import json
+import os
 
 # Thiết lập Gemini API key
 genai_api_key = "AIzaSyAfQfOJgGCRxJyDMjr9Kv5XpBGTZX_pASQ"  # Thay thế bằng API key của bạn
@@ -24,7 +25,6 @@ def get_embeddings(text):
 
 # Hàm lấy embedding từ Gemini API
 def get_gemini_embedding(text):
-    #st.write(f"Đang gọi API Gemini với nội dung: {text[:50]}...")  # In ra nội dung để kiểm tra
     response = pc.inference.embed(
     model="multilingual-e5-large",
     inputs=[text],
@@ -32,14 +32,12 @@ def get_gemini_embedding(text):
         "input_type": "query"
     }
 )
-    #st.write("Đang tìm kiếm câu trả lời..")  # Thông báo khi nhận được phản hồi
     return response.data[0]['values']
 
 # Hàm để viết lại câu trả lời bằng Gemini AI
 def rewrite_answer_with_gemini(content):
     model = genai.GenerativeModel('gemini-1.5-pro')
     response = model.generate_content("tổng hợp lại nội dung: " + content)
-    #response = model.generate_content("tìm {user_question} trong  " + content)
     return response.text
 
 # Hàm để tìm câu trả lời tốt nhất
@@ -47,11 +45,23 @@ def find_best_answer(user_question):
     user_embedding = get_gemini_embedding(user_question)
     result = index.query(namespace="ns1", vector=user_embedding, top_k=10, include_metadata=True)
     result_1 = index_1.query(namespace="ns1", vector=user_embedding, top_k=10, include_metadata=True)
-    best_matches = result['matches']+result_1['matches']
+    best_matches = result['matches'] + result_1['matches']
     answers = [match['metadata'].get('text', '') for match in best_matches if 'metadata' in match]
     content_to_rewrite = f"Câu hỏi: {user_question}\n Câu trả lời: {answers}"
     rewritten_answers = rewrite_answer_with_gemini(content_to_rewrite)
     return rewritten_answers
+
+# Hàm lưu log vào file trên server
+def save_log_to_server(history, log_filename="user_questions_log.json"):
+    # Ghi file vào thư mục logs (hoặc thư mục tùy chọn trên server)
+    logs_dir = "logs"
+    if not os.path.exists(logs_dir):
+        os.makedirs(logs_dir)  # Tạo thư mục nếu chưa có
+    log_file_path = os.path.join(logs_dir, log_filename)
+
+    # Ghi hoặc cập nhật log file
+    with open(log_file_path, "w", encoding='utf-8') as log_file:
+        json.dump(history, log_file, ensure_ascii=False, indent=4)
 
 # Giao diện Streamlit
 st.title("Hỏi đáp thông tin tần số vô tuyến điện")
@@ -77,6 +87,9 @@ if submit_button and user_question:
         # Lưu câu hỏi và câu trả lời vào session state
         st.session_state.history.append({"question": user_question, "answer": best_answer})
         
+        # Ghi log vào file trên server
+        save_log_to_server(st.session_state.history)
+
         # Xóa nội dung câu hỏi sau khi xử lý xong
         st.session_state.user_question = ""
     except ValueError as e:
