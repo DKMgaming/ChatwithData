@@ -49,30 +49,18 @@ def authenticate_google_drive():
 drive = authenticate_google_drive()
 
 # Hàm lưu log vào Google Drive
-def save_log_to_google_drive(drive, file_content, file_name, folder_id=None):
-    file_metadata = {'title': file_name}
-    if folder_id:
-        file_metadata['parents'] = [{'id': folder_id}]  # Gán file vào thư mục cụ thể
-    file_drive = drive.CreateFile(file_metadata)
-    file_drive.SetContentString(file_content)
-    file_drive.Upload()
-    print(f"File '{file_name}' has been uploaded to Google Drive.")
+def save_log_to_google_drive(history, log_filename="user_questions_log.json"):
+    log_file_path = log_filename
 
-# Xác thực Google Drive
-#drive = authenticate_google_drive()
+    # Lưu log vào file tạm thời
+    with open(log_file_path, "w", encoding='utf-8') as log_file:
+        json.dump(history, log_file, ensure_ascii=False, indent=4)
 
-# Nội dung của file JSON cần lưu
-log_data = {"questions": ["What is radio frequency?", "How does AI work?"]}
-
-# Chuyển đổi thành định dạng JSON
-log_data_json = json.dumps(log_data, indent=4)
-
-# ID thư mục (nếu bạn có)
-folder_id = '1pLA6AH8gC2Ujg_2CXYaCplM-Xa1ALsRR'  # Thay bằng ID của thư mục đích trên Google Drive
-
-# Lưu file vào Google Drive (trong thư mục chỉ định)
-save_user_questions_log_to_drive(drive, log_data_json, "user_questions_log.json", folder_id)
-
+    # Upload file log lên Google Drive
+    log_file_drive = drive.CreateFile({'title': log_filename})
+    log_file_drive.SetContentFile(log_file_path)
+    log_file_drive.Upload()
+    st.success("Log đã được lưu vào Google Drive")
 
 # Thiết lập Gemini API
 genai_api_key = "AIzaSyAfQfOJgGCRxJyDMjr9Kv5XpBGTZX_pASQ"
