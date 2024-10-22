@@ -87,7 +87,7 @@ def get_gemini_embedding(text):
     return response.data[0]['values']
 
 def rewrite_answer_with_gemini(content):
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    model = genai.GenerativeModel('gemini-1.5-pro-002')
     response = model.generate_content("Tổng hợp lại nội dung: " + content)
     return response.text
 
