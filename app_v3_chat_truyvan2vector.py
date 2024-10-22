@@ -69,9 +69,31 @@ def save_user_questions_log_to_drive(drive, log_data, file_name, folder_id=None)
 # Thiết lập Gemini API
 genai_api_key = "AIzaSyAfQfOJgGCRxJyDMjr9Kv5XpBGTZX_pASQ"
 genai.configure(api_key=genai_api_key)
+# Danh sách API key của Gemini
+gemini_models = [
+    "gemini-1.5-pro",  # Model 1
+    "gemini-1.5-pro-002",    # Model 2
+    "gemini-1.5-flash",    # Model 2
+    "gemini-1.5-flash-002",    # Model 2
+    "gemini-1.5-flash-8b",    # Model 2
+    # Thêm các model khác nếu cần
+]
+
+# Biến lưu trữ index của model hiện tại
+current_model_index = 0
+
+# Hàm để chuyển sang model tiếp theo
+def set_next_gemini_model():
+    global current_model_index
+    current_model_index += 1
+    if current_model_index >= len(gemini_models):
+        st.error("Tất cả các model đã hết giới hạn token hoặc không hợp lệ.")
+        return False  # Tất cả các model đã hết
+    else:
+        st.write(f"Sử dụng model thứ {current_model_index + 1}: {gemini_models[current_model_index]}")
+        return True  # Model mới đã được cấu hình thành công
 
 pc = pinecone.Pinecone(api_key="665d65c5-fb1f-45f9-8bf0-e3ad3d5a93bd")
-
 index = pc.Index("data-index")
 index_1 = pc.Index("kethop-index")
 
@@ -86,10 +108,26 @@ def get_gemini_embedding(text):
 )
     return response.data[0]['values']
 
+# Hàm để viết lại câu trả lời bằng Gemini AI với nhiều model
 def rewrite_answer_with_gemini(content):
-    model = genai.GenerativeModel('gemini-1.5-pro-002')
-    response = model.generate_content("Tổng hợp lại nội dung: " + content)
-    return response.text
+    global current_model_index
+    
+    # Cố gắng gọi API với model hiện tại
+    try:
+        model_name = gemini_models[current_model_index]
+        model = genai.GenerativeModel(model_name)
+        response = model.generate_content("tổng hợp lại nội dung: " + content)
+        return response.text
+
+    # Nếu có lỗi do giới hạn token của model, chuyển sang model khác
+    except Exception as e:
+        st.error(f"Lỗi khi gọi model {gemini_models[current_model_index]}: {str(e)}")
+
+        # Thử thay model mới nếu có lỗi
+        if set_next_gemini_model():
+            return rewrite_answer_with_gemini(content)  # Thử lại với model mới
+        else:
+            return "Không thể lấy câu trả lời do tất cả các model đã hết giới hạn token."
 
 def find_best_answer(user_question):
     user_embedding = get_gemini_embedding(user_question)
