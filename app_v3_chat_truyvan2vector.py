@@ -141,17 +141,23 @@ def find_best_answer(user_question):
     return rewritten_answers
 
 # Giao diện Streamlit
-st.title("Hỏi đáp thông tin tần số vô tuyến điện")
+st.markdown("<h1 style='text-align: center;'>Hỏi đáp thông tin tần số vô tuyến điện</h1>", unsafe_allow_html=True)
 
+# Khởi tạo session state để lưu lịch sử nếu chưa tồn tại
 if 'history' not in st.session_state:
     st.session_state.history = []
 
-if 'user_question' not in st.session_state:
-    st.session_state.user_question = ""
+# Thiết lập giao diện và kiểu chat
+st.write("<style> .chat-bubble {padding: 10px; margin: 5px 0; border-radius: 10px;} .user-bubble {background-color: #DCF8C6; text-align: left;} .bot-bubble {background-color: #E0E0E0; text-align: left;} </style>", unsafe_allow_html=True)
 
+# Thiết lập session state nếu chưa tồn tại
+if 'history' not in st.session_state:
+    st.session_state.history = []
+
+# Sử dụng form để cho phép gửi câu hỏi bằng cách nhấn Enter
 with st.form(key='question_form', clear_on_submit=True):
-    user_question = st.text_input("Vui lòng nhập câu hỏi của bạn", value=st.session_state.user_question, key="user_question_input")
-    submit_button = st.form_submit_button(label="Tìm câu trả lời")
+    user_question = st.text_input("💬 Bạn: ", key="user_question_input")
+    submit_button = st.form_submit_button(label="Gửi câu hỏi")
 
 if submit_button and user_question:
     try:
@@ -170,10 +176,11 @@ if submit_button and user_question:
 else:
     st.warning("Vui lòng nhập câu hỏi trước khi tìm kiếm.")
 
-st.subheader("Lịch sử câu hỏi và câu trả lời")
+# Hiển thị lịch sử các câu hỏi và câu trả lời
+st.subheader("📜 Lịch sử hội thoại")
 if st.session_state.history:
     for i, entry in enumerate(st.session_state.history[::-1], 1):
-        st.write(f"{i}. **Câu hỏi**: {entry['question']}")
-        st.write(f"   **Câu trả lời**: {entry['answer']}")
+        st.write(f"<div class='chat-bubble user-bubble'><strong>Bạn:</strong> {entry['question']}</div>", unsafe_allow_html=True)
+        st.write(f"<div class='chat-bubble bot-bubble'><strong>Bot:</strong> {entry['answer']}</div>", unsafe_allow_html=True)
 else:
     st.write("Chưa có câu hỏi nào được ghi lại.")
