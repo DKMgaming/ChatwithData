@@ -142,7 +142,8 @@ def find_best_answer(user_question):
 
 # Giao diện Streamlit
 st.markdown("<h1 style='text-align: center;'>Hỏi đáp về tần số vô tuyến điện</h1>", unsafe_allow_html=True)
-
+# Thêm dòng @copyright
+st.markdown("<p style='text-align: center; font-size: 12px; color: grey;'>@copyright Ngo Minh Tri</p>", unsafe_allow_html=True)
 # Khởi tạo session state để lưu lịch sử nếu chưa tồn tại
 if 'history' not in st.session_state:
     st.session_state.history = []
