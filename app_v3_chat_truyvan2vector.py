@@ -96,7 +96,7 @@ def set_next_gemini_model():
 pc = pinecone.Pinecone(api_key="665d65c5-fb1f-45f9-8bf0-e3ad3d5a93bd")
 index = pc.Index("data-index")
 index_1 = pc.Index("kethop-index")
-
+index_2 = pc.Index("page-index")
 # Hàm lấy embedding từ Gemini API
 def get_gemini_embedding(text):
     response = pc.inference.embed(
@@ -131,9 +131,10 @@ def rewrite_answer_with_gemini(content):
 
 def find_best_answer(user_question):
     user_embedding = get_gemini_embedding(user_question)
-    result = index.query(namespace="ns1", vector=user_embedding, top_k=10, include_metadata=True)
+    result = index.query(namespace="ns1", vector=user_embedding, top_k=5, include_metadata=True)
     result_1 = index_1.query(namespace="ns1", vector=user_embedding, top_k=10, include_metadata=True)
-    best_matches = result['matches'] + result_1['matches']
+    result_2 = index_2.query(namespace="ns1", vector=user_embedding, top_k=10, include_metadata=True)
+    best_matches = result['matches'] + result_1['matches'] + result_2['matches']
     answers = [match['metadata'].get('text', '') for match in best_matches if 'metadata' in match]
     content_to_rewrite = f"Câu hỏi: {user_question}\nCâu trả lời: {answers}"
     rewritten_answers = rewrite_answer_with_gemini(content_to_rewrite)
