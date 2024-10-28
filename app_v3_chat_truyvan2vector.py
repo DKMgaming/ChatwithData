@@ -121,7 +121,7 @@ def rewrite_answer_with_gemini(content):
 
     # Nếu có lỗi do giới hạn token của model, chuyển sang model khác
     except Exception as e:
-        st.error(f"Lỗi khi gọi model {gemini_models[current_model_index]}: {str(e)}")
+        #st.error(f"Lỗi khi gọi model {gemini_models[current_model_index]}: {str(e)}")
 
         # Thử thay model mới nếu có lỗi
         if set_next_gemini_model():
