@@ -90,7 +90,7 @@ def set_next_gemini_model():
         st.error("Tất cả các model đã hết giới hạn token hoặc không hợp lệ.")
         return False  # Tất cả các model đã hết
     else:
-        st.write(f"Sử dụng model thứ {current_model_index + 1}: {gemini_models[current_model_index]}")
+        #st.write(f"Sử dụng model thứ {current_model_index + 1}: {gemini_models[current_model_index]}")
         return True  # Model mới đã được cấu hình thành công
 
 pc = pinecone.Pinecone(api_key="665d65c5-fb1f-45f9-8bf0-e3ad3d5a93bd")
@@ -132,8 +132,8 @@ def rewrite_answer_with_gemini(content):
 def find_best_answer(user_question):
     user_embedding = get_gemini_embedding(user_question)
     result = index.query(namespace="ns1", vector=user_embedding, top_k=5, include_metadata=True)
-    result_1 = index_1.query(namespace="ns1", vector=user_embedding, top_k=10, include_metadata=True)
-    result_2 = index_2.query(namespace="ns1", vector=user_embedding, top_k=10, include_metadata=True)
+    result_1 = index_1.query(namespace="ns1", vector=user_embedding, top_k=5, include_metadata=True)
+    result_2 = index_2.query(namespace="ns1", vector=user_embedding, top_k=5, include_metadata=True)
     best_matches = result['matches'] + result_1['matches'] + result_2['matches']
     answers = [match['metadata'].get('text', '') for match in best_matches if 'metadata' in match]
     content_to_rewrite = f"Câu hỏi: {user_question}\nCâu trả lời: {answers}"
