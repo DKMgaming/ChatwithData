@@ -181,6 +181,6 @@ st.subheader("📜 Lịch sử hội thoại")
 if st.session_state.history:
     for i, entry in enumerate(st.session_state.history[::-1], 1):
         st.write(f"<div class='chat-bubble user-bubble'><strong>Bạn:</strong> {entry['question']}</div>", unsafe_allow_html=True)
-        st.write(f"<div class='chat-bubble bot-bubble'><strong>Bot:</strong> {entry['answer']}</div>", unsafe_allow_html=True)
+        st.write(f"<div class='chat-bubble bot-bubble'><strong>Trợ lý vui vẻ:</strong> {entry['answer']}</div>", unsafe_allow_html=True)
 else:
     st.write("Chưa có câu hỏi nào được ghi lại.")
