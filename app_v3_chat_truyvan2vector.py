@@ -116,7 +116,7 @@ def rewrite_answer_with_gemini(content):
     try:
         model_name = gemini_models[current_model_index]
         model = genai.GenerativeModel(model_name)
-        response = model.generate_content(content)
+        response = model.generate_content("Tổng hợp lại nội dung:"+ content)
         return response.text
 
     # Nếu có lỗi do giới hạn token của model, chuyển sang model khác
