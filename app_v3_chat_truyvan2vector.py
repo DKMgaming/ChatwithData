@@ -1,4 +1,5 @@
 import streamlit as st
+import time
 import google.generativeai as genai
 import pinecone
 from pydrive2.auth import GoogleAuth
@@ -6,7 +7,6 @@ from pydrive2.drive import GoogleDrive
 from oauth2client.service_account import ServiceAccountCredentials
 import os
 import json
-import time
 
 # Hàm để kiểm tra và xử lý các kiểu dữ liệu không hợp lệ
 def make_json_serializable(credentials_dict):
@@ -58,7 +58,7 @@ def save_user_questions_log_to_drive(drive, log_data, file_name, folder_id=None)
     file_drive = drive.CreateFile(file_metadata)
     file_drive.SetContentString(file_content.encode('utf-8').decode('utf-8'))
     file_drive.Upload()
-
+    
     print(f"File '{file_name}.txt' đã được tải lên Google Drive.")
 
 # Thiết lập Gemini API
@@ -92,10 +92,12 @@ index_2 = pc.Index("page-index")
 
 def get_gemini_embedding(text):
     response = pc.inference.embed(
-        model="multilingual-e5-large",
-        inputs=[text],
-        parameters={"input_type": "query"}
-    )
+    model="multilingual-e5-large",
+    inputs=[text],
+    parameters={
+        "input_type": "query"
+    }
+)
     return response.data[0]['values']
 
 def rewrite_answer_with_gemini(content):
@@ -122,15 +124,6 @@ def find_best_answer(user_question):
     rewritten_answers = rewrite_answer_with_gemini(content_to_rewrite)
     return rewritten_answers
 
-# Hàm để hiển thị câu trả lời với hiệu ứng typing
-def display_typing_effect(text, delay=0.05):
-    displayed_text = ""
-    for char in text:
-        displayed_text += char
-        st.markdown(f"<div class='chat-bubble bot-bubble'><strong>Trợ lý vui vẻ:</strong> {displayed_text}</div>", 
-                    unsafe_allow_html=True)
-        time.sleep(delay)
-
 # Giao diện Streamlit
 st.markdown("<h1 style='text-align: center;'>Hỏi đáp về tần số vô tuyến điện</h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center; font-size: 12px; color: grey;'>@copyright Ngo Minh Tri</p>", unsafe_allow_html=True)
@@ -138,7 +131,12 @@ st.markdown("<p style='text-align: center; font-size: 12px; color: grey;'>@copyr
 if 'history' not in st.session_state:
     st.session_state.history = []
 
-st.write("<style> .chat-bubble {padding: 10px; margin: 5px 0; border-radius: 10px;} .user-bubble {background-color: #DCF8C6; text-align: left;} .bot-bubble {background-color: #E0E0E0; text-align: left;} </style>", unsafe_allow_html=True)
+def typing_effect(text, speed=0.05):
+    displayed_text = ""
+    for char in text:
+        displayed_text += char
+        st.markdown(f"<p style='text-align: left;'>{displayed_text}</p>", unsafe_allow_html=True)
+        time.sleep(speed)
 
 with st.form(key='question_form', clear_on_submit=True):
     user_question = st.text_input("💬 Bạn: ", key="user_question_input")
@@ -146,15 +144,12 @@ with st.form(key='question_form', clear_on_submit=True):
 
 if submit_button and user_question:
     try:
-        st.write("<div class='chat-bubble bot-bubble'><strong>Trợ lý vui vẻ:</strong> Đang xử lý câu hỏi...</div>", unsafe_allow_html=True)
         best_answer = find_best_answer(user_question)
-        display_typing_effect(best_answer, delay=0.03)
         st.session_state.history.append({"question": user_question, "answer": best_answer})
-
         folder_id = '1pLA6AH8gC2Ujg_2CXYaCplM-Xa1ALsRR'
         save_user_questions_log_to_drive(drive, st.session_state.history, "user_questions_log.txt", folder_id)
-
-        st.session_state.user_question = ""
+        st.markdown("<strong>Trợ lý vui vẻ:</strong>", unsafe_allow_html=True)
+        typing_effect(best_answer)
     except ValueError as e:
         st.error(f"Lỗi: {e}")
 else:
