@@ -131,7 +131,7 @@ st.markdown("<p style='text-align: center; font-size: 12px; color: grey;'>@copyr
 if 'history' not in st.session_state:
     st.session_state.history = []
 
-def typing_effect(text, container, speed=0.05):
+def typing_effect(text, container, speed=0.1):
     displayed_text = ""
     for char in text:
         displayed_text += char
