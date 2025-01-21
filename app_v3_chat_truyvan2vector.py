@@ -92,12 +92,12 @@ index_2 = pc.Index("page-index")
 
 def get_gemini_embedding(text):
     response = pc.inference.embed(
-    model="multilingual-e5-large",
-    inputs=[text],
-    parameters={
-        "input_type": "query"
-    }
-)
+        model="multilingual-e5-large",
+        inputs=[text],
+        parameters={
+            "input_type": "query"
+        }
+    )
     return response.data[0]['values']
 
 def rewrite_answer_with_gemini(content):
@@ -131,11 +131,11 @@ st.markdown("<p style='text-align: center; font-size: 12px; color: grey;'>@copyr
 if 'history' not in st.session_state:
     st.session_state.history = []
 
-def typing_effect(text, speed=0.05):
+def typing_effect(text, container, speed=0.05):
     displayed_text = ""
     for char in text:
         displayed_text += char
-        st.markdown(f"<p style='text-align: left;'>{displayed_text}</p>", unsafe_allow_html=True)
+        container.markdown(f"<p style='text-align: left;'>{displayed_text}</p>", unsafe_allow_html=True)
         time.sleep(speed)
 
 with st.form(key='question_form', clear_on_submit=True):
@@ -148,8 +148,9 @@ if submit_button and user_question:
         st.session_state.history.append({"question": user_question, "answer": best_answer})
         folder_id = '1pLA6AH8gC2Ujg_2CXYaCplM-Xa1ALsRR'
         save_user_questions_log_to_drive(drive, st.session_state.history, "user_questions_log.txt", folder_id)
+        container = st.empty()
         st.markdown("<strong>Trợ lý vui vẻ:</strong>", unsafe_allow_html=True)
-        typing_effect(best_answer)
+        typing_effect(best_answer, container)
     except ValueError as e:
         st.error(f"Lỗi: {e}")
 else:
@@ -158,7 +159,7 @@ else:
 st.subheader("📜 Lịch sử hội thoại")
 if st.session_state.history:
     for i, entry in enumerate(st.session_state.history[::-1], 1):
-        st.write(f"<div class='chat-bubble user-bubble'><strong>Bạn:</strong> {entry['question']}</div>", unsafe_allow_html=True)
-        st.write(f"<div class='chat-bubble bot-bubble'><strong>Trợ lý vui vẻ:</strong> {entry['answer']}</div>", unsafe_allow_html=True)
+        st.markdown(f"<div style='border: 1px solid #f0f0f0; padding: 10px; margin-bottom: 5px;'><strong>Bạn:</strong> {entry['question']}</div>", unsafe_allow_html=True)
+        st.markdown(f"<div style='border: 1px solid #f0f0f0; padding: 10px; background-color: #f9f9f9;'><strong>Trợ lý vui vẻ:</strong> {entry['answer']}</div>", unsafe_allow_html=True)
 else:
     st.write("Chưa có câu hỏi nào được ghi lại.")
