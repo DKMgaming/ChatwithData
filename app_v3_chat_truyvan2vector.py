@@ -67,6 +67,7 @@ genai.configure(api_key=genai_api_key)
 
 # Danh sách API key của Gemini
 gemini_models = [
+    "gemini-2.0-flash-thinking-exp-01-21",
     "gemini-1.5-pro",
     "gemini-1.5-pro-002",
     "gemini-1.5-flash",
@@ -149,7 +150,7 @@ if submit_button and user_question:
         folder_id = '1pLA6AH8gC2Ujg_2CXYaCplM-Xa1ALsRR'
         save_user_questions_log_to_drive(drive, st.session_state.history, "user_questions_log.txt", folder_id)
         container = st.empty()
-        st.markdown("<strong>Trợ lý vui vẻ:</strong>", unsafe_allow_html=True)
+        #st.markdown("<strong>Trợ lý vui vẻ:</strong>", unsafe_allow_html=True)
         typing_effect(best_answer, container)
     except ValueError as e:
         st.error(f"Lỗi: {e}")
