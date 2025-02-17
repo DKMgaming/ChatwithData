@@ -7,6 +7,7 @@ from pydrive2.drive import GoogleDrive
 from oauth2client.service_account import ServiceAccountCredentials
 import os
 import json
+import pyttsx3
 
 # Hàm để kiểm tra và xử lý các kiểu dữ liệu không hợp lệ
 def make_json_serializable(credentials_dict):
@@ -138,6 +139,11 @@ def typing_effect(text, container, speed=0.01):
         displayed_text += char
         container.markdown(f"<p style='text-align: left;'>{displayed_text}</p>", unsafe_allow_html=True)
         time.sleep(speed)
+def speak_text(text):
+    engine = pyttsx3.init()
+    engine.setProperty("rate", 150)  # Điều chỉnh tốc độ đọc
+    engine.say(text)
+    engine.runAndWait()
 
 with st.form(key='question_form', clear_on_submit=True):
     user_question = st.text_input("💬 Bạn: ", key="user_question_input")
@@ -152,6 +158,9 @@ if submit_button and user_question:
         container = st.empty()
         #st.markdown("<strong>Trợ lý vui vẻ:</strong>", unsafe_allow_html=True)
         typing_effect(best_answer, container)
+        # Thêm nút đọc câu trả lời
+        if st.button("🔊 Đọc câu trả lời"):
+            speak_text(best_answer)
     except ValueError as e:
         st.error(f"Lỗi: {e}")
 else:
