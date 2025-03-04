@@ -107,7 +107,7 @@ def rewrite_answer_with_gemini(content):
     try:
         model_name = gemini_models[current_model_index]
         model = genai.GenerativeModel(model_name)
-        response = model.generate_content("Tổng hợp lại nội dung:" + content)
+        response = model.generate_content("Với cương vị là Trợ lý AI về tần số vô tuyến điện hãy cho câu trả lời tối ưu nhất" + content)
         return response.text
     except Exception as e:
         if set_next_gemini_model():
