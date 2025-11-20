@@ -68,12 +68,9 @@ genai.configure(api_key=genai_api_key)
 
 # Danh sách API key của Gemini
 gemini_models = [
-    "gemini-2.0-flash-thinking-exp-01-21",
-    "gemini-1.5-pro",
-    "gemini-1.5-pro-002",
-    "gemini-1.5-flash",
-    "gemini-1.5-flash-002",
-    "gemini-1.5-flash-8b",
+    "gemini-2.5-flash",
+    "gemini-2.5-pro",
+    
 ]
 
 current_model_index = 0
@@ -173,3 +170,4 @@ if st.session_state.history:
         st.markdown(f"<div style='border: 1px solid #f0f0f0; padding: 10px; background-color: #f9f9f9;'><strong>Trợ lý vui vẻ:</strong> {entry['answer']}</div>", unsafe_allow_html=True)
 else:
     st.write("Chưa có câu hỏi nào được ghi lại.")
+
