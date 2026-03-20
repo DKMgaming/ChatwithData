@@ -115,9 +115,10 @@ def rewrite_answer_with_gemini(content):
 def find_best_answer(user_question):
     user_embedding = get_gemini_embedding(user_question)
     result = index.query(namespace="ns1", vector=user_embedding, top_k=5, include_metadata=True)
-    result_1 = index_1.query(namespace="ns1", vector=user_embedding, top_k=5, include_metadata=True)
-    result_2 = index_2.query(namespace="ns1", vector=user_embedding, top_k=5, include_metadata=True)
-    best_matches = result['matches'] + result_1['matches'] + result_2['matches']
+    # result_1 = index_1.query(namespace="ns1", vector=user_embedding, top_k=5, include_metadata=True)
+    # result_2 = index_2.query(namespace="ns1", vector=user_embedding, top_k=5, include_metadata=True)
+    # + result_1['matches'] + result_2['matches']
+    best_matches = result['matches']
     answers = [match['metadata'].get('text', '') for match in best_matches if 'metadata' in match]
     content_to_rewrite = f"Câu hỏi: {user_question}\nCâu trả lời: {answers}"
     rewritten_answers = rewrite_answer_with_gemini(content_to_rewrite)
