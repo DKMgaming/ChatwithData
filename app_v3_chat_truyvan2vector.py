@@ -85,7 +85,7 @@ def set_next_gemini_model():
         return True
 
 pc = pinecone.Pinecone(api_key="665d65c5-fb1f-45f9-8bf0-e3ad3d5a93bd")
-index = pc.Index("data-index")
+index = pc.Index("pdf-chunks")
 index_1 = pc.Index("kethop-index")
 index_2 = pc.Index("page-index")
 
